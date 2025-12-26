@@ -1,12 +1,14 @@
-workspace "glfw-ws"
-  configurations { "Debug", "Release" }
-  platforms { "win32", "x64" }
-  location "build"
-
 local SDL3_DIR = "SDL3-3.2.28"
 local SDL3_INCLUDE_DIR = SDL3_DIR .. "/include"
 local SDL3_LIB_X86 = SDL3_DIR .. "/lib/x86"
 local SDL3_LIB_X64 = SDL3_DIR .. "/lib/x64"
+
+local GLFW_WIN32_DIR = "glfw-3.4.bin.WIN32"
+local GLFW_WIN64_DIR = "glfw-3.4.bin.WIN64"
+local GLFW_INCLUDE_DIR = GLFW_WIN64_DIR .. "/include"
+
+local IMGUI_DIR = "imgui-1.91.4"
+local IMGUI_BACKENDS_DIR = IMGUI_DIR .. "/backends"
 
 function use_sdl3()
   includedirs { SDL3_INCLUDE_DIR }
@@ -24,47 +26,43 @@ function use_sdl3()
   filter {}
 end
 
-project "glfw"
-  kind "StaticLib"
-  language "C"
-  targetdir "build/lib/%{cfg.buildcfg}"
-  files { "glfw/include/**.h", "glfw/src/**.c" }
-  includedirs { "glfw/include" }
-  defines { "_GLFW_USE_CONFIG_H" }
-  filter "system:windows"
-    links { "opengl32", "gdi32", "user32", "kernel32" }
-  filter "configurations:Debug"
-    symbols "On"
-  filter "configurations:Release"
-    optimize "On"
+function use_glfw()
+  includedirs { GLFW_INCLUDE_DIR }
 
-project "glfwW"
-  kind "ConsoleApp"
-  language "C++"
-  targetdir "bin/%{cfg.buildcfg}"
-  
-  files { 
-      "glfwW/**.h", 
-      "glfwW/**.cpp"
+  filter { "system:windows", "platforms:x64" }
+    libdirs { GLFW_WIN64_DIR .. "/lib-vc2022" }
+    links { "glfw3dll" }
+    defines { "GLFW_DLL" }
+    postbuildcommands { "{COPY} " .. GLFW_WIN64_DIR .. "/lib-vc2022/glfw3.dll %{cfg.targetdir}" }
+
+  filter { "system:windows", "platforms:win32" }
+    libdirs { GLFW_WIN32_DIR .. "/lib-vc2022" }
+    links { "glfw3dll" }
+    defines { "GLFW_DLL" }
+    postbuildcommands { "{COPY} " .. GLFW_WIN32_DIR .. "/lib-vc2022/glfw3.dll %{cfg.targetdir}" }
+
+  filter {}
+end
+
+function use_imgui_glfw_opengl3(loader_define)
+  loader_define = loader_define or "IMGUI_IMPL_OPENGL_LOADER_GLAD"
+
+  includedirs { IMGUI_DIR, IMGUI_BACKENDS_DIR }
+
+  files {
+    IMGUI_DIR .. "/imgui.cpp",
+    IMGUI_DIR .. "/imgui_demo.cpp",
+    IMGUI_DIR .. "/imgui_draw.cpp",
+    IMGUI_DIR .. "/imgui_tables.cpp",
+    IMGUI_DIR .. "/imgui_widgets.cpp",
+    IMGUI_BACKENDS_DIR .. "/imgui_impl_glfw.cpp",
+    IMGUI_BACKENDS_DIR .. "/imgui_impl_opengl3.cpp"
   }
-  
-  includedirs { 
-      "../../mylibaries/glfw-3.4.bin.WIN32/glfw-3.4.bin.WIN32/include"
-  }
-  
-  libdirs { 
-      "../../mylibaries/glfw-3.4.bin.WIN32/glfw-3.4.bin.WIN32/lib-vc2022"
-  }
-  
-  links { 
-      "glfw3",
-      "opengl32"
-  }
-  
-  filter "configurations:Debug"
-    defines { "DEBUG" }
-    symbols "On"
-  
-  filter "configurations:Release"
-    defines { "NDEBUG" }
-    optimize "On"
+
+  defines { loader_define }
+
+  filter "system:windows"
+    links { "opengl32" }
+
+  filter {}
+end
