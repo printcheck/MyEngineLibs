@@ -2,6 +2,15 @@
 
 Pre-packaged third-party binaries to drop into Windows/Visual Studio projects.
 
+## Quickstart (Visual Studio 2022 + Premake)
+
+Use the included starter project to generate a ready-to-build VS2022 solution:
+
+1. Open an **x64 Native Tools Command Prompt for VS 2022**.
+2. From the repo root run: `premake5 vs2022 --file=examples/vs2022-starter/premake5.lua`
+3. Open `examples/vs2022-starter/build/VS2022Starter.sln`, build **StarterApp**, and run it.
+4. SDL3 headers/libs/DLLs are wired up via `use_sdl3()`; replace `src/main.cpp` with your own code to begin your project.
+
 ## SDL3 (Visual Studio 2022)
 
 - Version: **3.2.28** (developer package)
