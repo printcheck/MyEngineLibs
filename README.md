@@ -42,7 +42,7 @@ project "myapp"
   use_glfw() -- adds include/lib paths and copies glfw3.dll for x64/Win32
   files { "src/**.cpp", "src/**.h" }
 ```
-By default the helper points at the `lib-vc2022` folders; set `GLFW_MSVC_LIBDIR` (e.g. to `lib-vc2019`) before running Premake if you need a different toolset folder.
+The helper picks the first available `lib-vc####` folder (preferring any `GLFW_MSVC_LIBDIR` value, then `lib-vc2022`, `lib-vc2019`, and so on).
 
 ### Manual setup in Visual Studio 2022
 1. **Include Directory:** add `C:\path\to\MyEngineLibs\glfw-3.4.bin.WIN64\include` (or the WIN32 folder for 32-bit builds).
