@@ -5,7 +5,9 @@ local SDL3_LIB_X64 = SDL3_DIR .. "/lib/x64"
 
 local GLFW_WIN32_DIR = "glfw-3.4.bin.WIN32"
 local GLFW_WIN64_DIR = "glfw-3.4.bin.WIN64"
-local GLFW_INCLUDE_DIR = GLFW_WIN64_DIR .. "/include"
+local GLFW_MSVC_LIBDIR = os.getenv("GLFW_MSVC_LIBDIR") or "lib-vc2022"
+local GLFW_INCLUDE_WIN32 = GLFW_WIN32_DIR .. "/include"
+local GLFW_INCLUDE_WIN64 = GLFW_WIN64_DIR .. "/include"
 
 local IMGUI_DIR = "imgui-1.91.4"
 local IMGUI_BACKENDS_DIR = IMGUI_DIR .. "/backends"
@@ -27,24 +29,25 @@ function use_sdl3()
 end
 
 function use_glfw()
-  includedirs { GLFW_INCLUDE_DIR }
-
   filter { "system:windows", "platforms:x64" }
-    libdirs { GLFW_WIN64_DIR .. "/lib-vc2022" }
+    includedirs { GLFW_INCLUDE_WIN64 }
+    libdirs { GLFW_WIN64_DIR .. "/" .. GLFW_MSVC_LIBDIR }
     links { "glfw3dll" }
     defines { "GLFW_DLL" }
-    postbuildcommands { "{COPY} " .. GLFW_WIN64_DIR .. "/lib-vc2022/glfw3.dll %{cfg.targetdir}" }
+    postbuildcommands { "{COPY} " .. GLFW_WIN64_DIR .. "/" .. GLFW_MSVC_LIBDIR .. "/glfw3.dll %{cfg.targetdir}" }
 
   filter { "system:windows", "platforms:win32" }
-    libdirs { GLFW_WIN32_DIR .. "/lib-vc2022" }
+    includedirs { GLFW_INCLUDE_WIN32 }
+    libdirs { GLFW_WIN32_DIR .. "/" .. GLFW_MSVC_LIBDIR }
     links { "glfw3dll" }
     defines { "GLFW_DLL" }
-    postbuildcommands { "{COPY} " .. GLFW_WIN32_DIR .. "/lib-vc2022/glfw3.dll %{cfg.targetdir}" }
+    postbuildcommands { "{COPY} " .. GLFW_WIN32_DIR .. "/" .. GLFW_MSVC_LIBDIR .. "/glfw3.dll %{cfg.targetdir}" }
 
   filter {}
 end
 
 function use_imgui_glfw_opengl3(loader_define)
+  -- Defaults to GLAD; pass a different loader macro if your project uses another OpenGL loader.
   loader_define = loader_define or "IMGUI_IMPL_OPENGL_LOADER_GLAD"
 
   includedirs { IMGUI_DIR, IMGUI_BACKENDS_DIR }
