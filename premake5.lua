@@ -76,7 +76,7 @@ function use_glfw()
 end
 
 function use_imgui_glfw_opengl3(loader_define)
-  -- Defaults to GLAD; pass another supported loader macro (e.g. IMGUI_IMPL_OPENGL_LOADER_GLEW, IMGUI_IMPL_OPENGL_LOADER_GL3W, or IMGUI_IMPL_OPENGL_LOADER_GLAD2) if your project uses a different OpenGL loader.
+  -- Optional loader macro parameter; defaults to GLAD. See README for other supported loaders.
   loader_define = loader_define or "IMGUI_IMPL_OPENGL_LOADER_GLAD"
 
   includedirs { IMGUI_DIR, IMGUI_BACKENDS_DIR }
