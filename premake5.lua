@@ -19,6 +19,10 @@ local function resolve_glfw_libdir(base)
     "lib-vc2013",
   }
 
+  if not os.isdir(base) then
+    return candidates[2]
+  end
+
   for _, folder in ipairs(candidates) do
     if folder and folder ~= "" then
       local candidate = base .. "/" .. folder
@@ -72,7 +76,7 @@ function use_glfw()
 end
 
 function use_imgui_glfw_opengl3(loader_define)
-  -- Defaults to GLAD; pass a different loader macro (e.g. IMGUI_IMPL_OPENGL_LOADER_GLEW or IMGUI_IMPL_OPENGL_LOADER_GL3W) if your project uses another OpenGL loader.
+  -- Defaults to GLAD; pass another supported loader macro (e.g. IMGUI_IMPL_OPENGL_LOADER_GLEW, IMGUI_IMPL_OPENGL_LOADER_GL3W, or IMGUI_IMPL_OPENGL_LOADER_GLAD2) if your project uses a different OpenGL loader.
   loader_define = loader_define or "IMGUI_IMPL_OPENGL_LOADER_GLAD"
 
   includedirs { IMGUI_DIR, IMGUI_BACKENDS_DIR }
